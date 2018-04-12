@@ -1,34 +1,30 @@
 package rest
 
 import (
-	"github.com/bitfinexcom/bitfinex-api-go/v2"
 	"path"
+
+	"github.com/bitfinexcom/bitfinex-api-go/v2"
 )
 
 // TradeService manages the Trade endpoint.
 type TradeService struct {
 	Synchronous
+	Authenticator
 }
 
 // All returns all orders for the authenticated account.
-func (s *TradeService) All(symbol string) (*bitfinex.TradeSnapshot, error) {
-
-	raw, err := s.Request(NewRequestWithData(path.Join("trades", symbol, "hist"), map[string]interface{}{"start": nil, "end": nil, "limit": nil}))
-
+func (s *TradeService) All(symbol string, params ...map[string]interface{}) (ts []*bitfinex.RestTrade, err error) {
+	p := ReadParams(params...)
+	r, err := s.NewAuthenticatedPostRequest(path.Join("auth", "r", "trades", symbol, "hist"), p)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	dat := make([][]float64, 0)
-	for _, r := range raw {
-		if f, ok := r.([]float64); ok {
-			dat = append(dat, f)
-		}
-	}
-
-	os, err := bitfinex.NewTradeSnapshotFromRaw(symbol, dat)
+	raw, err := s.Request(r)
 	if err != nil {
-		return nil, err
+		return
 	}
-	return os, nil
+
+	ts, err = bitfinex.NewRestTradeSliceFromRaw(raw)
+	return
 }

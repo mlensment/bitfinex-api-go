@@ -396,6 +396,57 @@ type Trade struct {
 	Side   OrderSide
 }
 
+// Not sure if Trade is used by websocket, just to be safe, create new type
+type RestTrade struct {
+	Id          int64
+	Pair        string
+	MTS         int64
+	OrderId     int64
+	Amount      float64
+	Price       float64
+	OrderType   string
+	OrderPrice  float64
+	Maker       int
+	Fee         float64
+	FeeCurrency string
+}
+
+func NewRestTradeFromRaw(raw []interface{}) (t *RestTrade, err error) {
+	if len(raw) < 10 {
+		err = fmt.Errorf("data slice too short for trade: %#v", raw)
+		return
+	}
+
+	t = &RestTrade{
+		Id:          i64ValOrZero(raw[0]),
+		Pair:        sValOrEmpty(raw[1]),
+		MTS:         i64ValOrZero(raw[2]),
+		OrderId:     i64ValOrZero(raw[3]),
+		Amount:      f64ValOrZero(raw[4]),
+		Price:       f64ValOrZero(raw[5]),
+		OrderType:   sValOrEmpty(raw[6]),
+		OrderPrice:  f64ValOrZero(raw[7]),
+		Maker:       iValOrZero(raw[8]),
+		Fee:         f64ValOrZero(raw[9]),
+		FeeCurrency: sValOrEmpty(raw[10]),
+	}
+
+	return
+}
+
+func NewRestTradeSliceFromRaw(raw []interface{}) (ts []*RestTrade, err error) {
+	for _, rawTrade := range raw {
+		t, err := NewRestTradeFromRaw(rawTrade.([]interface{}))
+		if err != nil {
+			break
+		}
+
+		ts = append(ts, t)
+	}
+
+	return
+}
+
 func NewTradeFromRaw(pair string, raw []interface{}) (o *Trade, err error) {
 	if len(raw) < 4 {
 		return o, fmt.Errorf("data slice too short for trade: %#v", raw)

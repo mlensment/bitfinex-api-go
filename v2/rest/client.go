@@ -68,7 +68,7 @@ func NewClientWithSynchronous(sync Synchronous) *Client {
 
 	c.Orders = OrderService{Synchronous: c, Authenticator: c.Authenticator}
 	c.Book = BookService{Synchronous: c}
-	c.Trades = TradeService{Synchronous: c}
+	c.Trades = TradeService{Synchronous: c, Authenticator: c.Authenticator}
 	c.Platform = PlatformService{Synchronous: c}
 	c.Positions = PositionService{Synchronous: c}
 	return c
