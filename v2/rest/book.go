@@ -1,10 +1,11 @@
 package rest
 
 import (
-	"github.com/bitfinexcom/bitfinex-api-go/v2"
 	"net/url"
 	"path"
 	"strconv"
+
+	"github.com/bitfinexcom/bitfinex-api-go/v2"
 )
 
 // Book precision levels
