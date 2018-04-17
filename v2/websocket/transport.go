@@ -128,7 +128,7 @@ func (w *ws) listenWs() {
 			w.cleanup(err)
 			return
 		}
-		log.Printf("srv->ws: %s", string(msg))
+
 		w.downstream <- msg
 	}
 }
